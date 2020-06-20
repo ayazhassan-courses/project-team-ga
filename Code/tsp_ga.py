@@ -11,8 +11,6 @@ def generate_input(N):
 
     return cityList
 
-dummyList=[(83, 31), (45, 97), (199, 26), (198, 124), (78, 92)]
-
 #City==============================================================
 
 def distance(citylist,city1, city2):
@@ -58,8 +56,6 @@ def drawGraph(graph):
     plt.show()
 
 #Determine Fitness==============================================================
-
-dummyRoute=[(199, 26), (83, 31), (78, 92), (45, 97), (198, 124)]
 
 def routeDistance(route):
     pathDistance=0
@@ -201,12 +197,24 @@ def geneticAlgorithm(population, popSize, eliteSize, mutationRate, generations):
     plt.xlabel('Generation')
     plt.show()
 
-#Running the genetic algorithm
+#Running the genetic algorithm==============================================================
 
-#cityList = generate_input(25)
+#cityList = generate_input(10)
+#print(cityList)
 
 TestCitylist1 = [(96,9), (26,29), (151,122), (95,81), (177,104), (13,52), (4,73), (92,121), (129,80), (102,197)]
 TestCitylist2 = [(43,172), (157,164), (190,15), (178,69), (36,70), (5,40), (8,3), (121,113), (104,112), (114,14)]
 
-geneticAlgorithmPlot(population=TestCitylist1, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+from time import time 
 
+#Experimental Analysis
+start_time = time() # record the starting time run algorithm 
+
+geneticAlgorithm(population=TestCitylist1, popSize=100, eliteSize=20, mutationRate=0.01, generations=500)
+
+#No.Generations = Stopping Criteria
+
+end_time = time() # record the ending 
+
+time_elapsed = end_time-start_time # compute the elapsed time
+print("Time taken: "+str(time_elapsed))
