@@ -68,7 +68,7 @@ def choice_by_roulette(sorted_population, fitness_sum):
     draw = random.uniform(0, 1) #random number
 
     accumulated = 0
-    for individual in sorted_population:
+    for individual in sorted_population[::-1]:
         fitness = apply_fitness_function(individual) + offset
         probability = fitness / normalized_fitness_sum  #fitness ratio
         accumulated += probability
@@ -133,8 +133,10 @@ def evolve(generations,x_domain, y_domain):
         for individual in population: 
             z=apply_fitness_function(individual)
             print(individual,z )
+            #if z==5.0:
+            #    flag=True
         progress.append(apply_fitness_function(sort_population_by_fitness(population)[-1]))
-        if i == generations:
+        if i == generations: #or flag==True:
             return population, progress
         i += 1
         population = make_next_generation(population, x_domain,y_domain)

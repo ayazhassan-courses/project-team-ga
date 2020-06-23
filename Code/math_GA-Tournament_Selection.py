@@ -34,43 +34,41 @@ ax.set_ylabel('y')
 ax.set_zlabel('z')
 plt.show()
 ##############################################################################33
+# Let size of population be n
+# Let no of generatioons be g
 
 #Generate random solutions {x,y} within the domain of the function 
 #and adds them to population
-def generate_population(population_size, x_domain, y_domain):
-    lower_x_boundary, upper_x_boundary = x_domain
-    lower_y_boundary, upper_y_boundary = y_domain
+def generate_population(population_size, x_domain, y_domain): # O(n)
+    lower_x_boundary, upper_x_boundary = x_domain   # O(1)
+    lower_y_boundary, upper_y_boundary = y_domain   # O(1)
     
-    population = []
-    for i in range(population_size):
+    population = []                                 # O(1)
+    for i in range(population_size):           #Loop executes for n times.
         individual = {
             "x": round(random.uniform(lower_x_boundary, upper_x_boundary),3),
             "y": round(random.uniform(lower_y_boundary, upper_y_boundary),3)
         }
-        population.append(individual)
+        population.append(individual)               # O(1)
 
-    return population
+    return population                               # O(1)
 
 ################ OBJECTIVE FUNCTION WE WANT TO MAXIMIZE ##################
-def apply_fitness_function(individual):
-    x = individual["x"]
-    y = individual["y"]
+def apply_fitness_function(individual):     # O(1)
+    x = individual["x"]     # O(1)
+    y = individual["y"]     # O(1)
     return round((-((x-3) ** 2 + y ** 2)+5),3)
 
 ################## SELECTION STRATEGY TO FORM A PINWHEEL AND SELECT A RANDOM NUMBER
-def tournament_selection(k,sorted_population):
-    best = {'x':-1000, 'y':-1000}
-    for i in range(k):
-        ind = sorted_population[random.randint(0,len(sorted_population)-1)]
-        if (best == 1000) or apply_fitness_function(ind) > apply_fitness_function(best):
-            best = ind
-    return best
+def tournament_selection(k,sorted_population):       ##O(n)
+    parent_pool=random.sample(sorted_population, k)
+    return max(parent_pool, key=apply_fitness_function)
 ##### sprt population in ascending order of their fitness levels        
-def sort_population_by_fitness(population):
+def sort_population_by_fitness(population):  # O(nlogn) time complexity of python's built in sort method
     return sorted(population, key=apply_fitness_function)
 
 ######## crossover by taking a point in between the two coordinates ###########
-def crossover(individual_1, individual_2):
+def crossover(individual_1, individual_2):               # O(1)
     x1 = individual_1["x"]
     y1 = individual_1["y"]
 
@@ -80,7 +78,7 @@ def crossover(individual_1, individual_2):
     return {"x":round((x1 + x2)/2,3) , "y":round((y1 + y2) / 2,3)}
 
 ########### mutate witihin these bounds
-def mutate(individual, x_domain, y_domain):
+def mutate(individual, x_domain, y_domain): # O(1))
     next_x = individual["x"] + round(random.uniform(-0.15, 0.15),3)
     next_y = individual["y"] + round(random.uniform(-0.15, 0.15),3)
     # Guarantee we keep inside boundaries
@@ -90,21 +88,21 @@ def mutate(individual, x_domain, y_domain):
     return {"x": mutated_x, "y": mutated_y}
 
 
-def make_next_generation(previous_population, x_domain, y_domain):
+def make_next_generation(previous_population, x_domain, y_domain): #(n^2)  
     mutation_rate, elite_size=0.2,2
     next_generation = []
-    sorted_by_fitness_population = sort_population_by_fitness(previous_population)
+    sorted_by_fitness_population = sort_population_by_fitness(previous_population) #O(nlogn)
     population_size = len(previous_population)
-    fitness_sum = sum(apply_fitness_function(individual) for individual in previous_population)
+    fitness_sum = sum(apply_fitness_function(individual) for individual in previous_population) #O(n)
 
-    for i in range(population_size-elite_size):
-        first_choice = tournament_selection(4,sorted_by_fitness_population)
-        second_choice = tournament_selection(4,sorted_by_fitness_population)
-        individual = crossover(first_choice, second_choice)
+    for i in range(population_size-elite_size): #O(n)
+        first_choice = tournament_selection(4,sorted_by_fitness_population) #O(n-k)
+        second_choice = tournament_selection(4,sorted_by_fitness_population) #O(n-k)
+        individual = crossover(first_choice, second_choice) #O(1)
         if random.random()>mutation_rate:
-            individual = mutate(individual,x_domain,y_domain)
-        next_generation.append(individual)
-    next_generation.extend(sorted_by_fitness_population[population_size-elite_size:])
+            individual = mutate(individual,x_domain,y_domain)#O(1)
+        next_generation.append(individual)#O(1)
+    next_generation.extend(sorted_by_fitness_population[population_size-elite_size:]) #O(k)
     return next_generation
 
 generations = 100
@@ -112,29 +110,33 @@ x_domain=(-4, 4)
 y_domain=(-4, 4)
 population_size=10
 
-def evolve(generations,x_domain, y_domain):
+def evolve(generations,x_domain, y_domain): #O(g*n^2)
     i = 1
     progress=[]
-    population = generate_population(population_size, x_domain, y_domain)
-    while True:
+    population = generate_population(population_size, x_domain, y_domain) #O(n)
+    while True:  #O(g)
         print(f" GENERATION {i}")
         flag=False
-        for individual in population: 
+        for individual in population: #O(n)
             z=apply_fitness_function(individual)
             print(individual,z )
             if z==5.0:
                 flag=True
-        progress.append(apply_fitness_function(sort_population_by_fitness(population)[-1]))
+        progress.append(apply_fitness_function(max(population, key=apply_fitness_function))) #O(n))
         if i == generations or flag==True:
             return population, progress
         i += 1
-        population = make_next_generation(population, x_domain,y_domain)
-
+        population = make_next_generation(population, x_domain,y_domain) #O(n^2)
+############## FUNCTION CALL & DISPLAY OUTPUT ###########################
 population, progress= evolve(generations, x_domain, y_domain)
-best_individual = sort_population_by_fitness(population)[-1]
+best_individual = max(population, key=apply_fitness_function) #O(n)
 print("\n FINAL RESULT")
 print(best_individual, apply_fitness_function(best_individual))
 plt.plot(progress)
 plt.ylabel('Fitness Score')
 plt.xlabel('Generation')
 plt.show()
+
+##Overall Time Complexity = #O(g*n^2)
+# where g = no. of generations
+# where n = size of population or no of solutions
